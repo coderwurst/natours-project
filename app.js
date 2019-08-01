@@ -5,6 +5,8 @@ const app = express();
 
 app.use(express.json());        // middleware to add data to request body
 
+const database = `${__dirname}/dev-data/data/tours-simple.json`;
+
 // routing app.http-method.url
 // app.get('/', (request, response) => {        // root
 //     response
@@ -20,7 +22,7 @@ app.use(express.json());        // middleware to add data to request body
 // });
 
 const tourData = JSON.parse(
-    fs.readFileSync(`${__dirname}/dev-data/data/tours-simple.json`)
+    fs.readFileSync(database)
 );
 
 app.get('/api/v1/tours', (request, response) => {
@@ -34,8 +36,19 @@ app.get('/api/v1/tours', (request, response) => {
 });
 
 app.post('/api/v1/tours', (request, response) => {
-    console.log(request.body);
-    response.status(200).send('data received')
+    const newId = tourData[tourData.length - 1].id + 1;
+    const newTour = Object.assign({ id: newId }, request.body);       // Object.assign to merge 2 objects
+    
+    tourData.push(newTour);
+
+    fs.writeFile(database, JSON.stringify(tourData), err => {
+        response.status(201).json({
+            status: 'success',
+            data: {
+                tour: newTour
+            }
+        });
+    });
 });
 
 const port = 3000;
