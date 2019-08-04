@@ -7,20 +7,6 @@ app.use(express.json());        // middleware to add data to request body
 
 const database = `${__dirname}/dev-data/data/tours-simple.json`;
 
-// routing app.http-method.url
-// app.get('/', (request, response) => {        // root
-//     response
-//     .status(200)
-//     .json(
-//         {   message: 'hello from the express server',
-//             app: 'natours-project'
-//         });
-// });
-
-// app.post('/', (request, response) => {        // root
-//     response.status(200).send('post to this end point');
-// });
-
 const tourData = JSON.parse(
     fs.readFileSync(database)
 );
@@ -31,6 +17,23 @@ app.get('/api/v1/tours', (request, response) => {
         results: tourData.length, 
         data: {
             tours: tourData
+        }
+    })
+});
+
+app.get('/api/v1/tours/:id', (request, response) => {
+    const id = request.params.id * 1;
+    const tour = tourData.find(element => element.id === id);
+    if(!tour) {
+        return response.status(404).json({
+            status: 'failed',
+            message: 'invalid id'
+        })
+    }
+    response.status(200).json({
+        status: 'success',
+        data: {
+            tour: tour
         }
     })
 });
