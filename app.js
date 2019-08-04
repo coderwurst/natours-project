@@ -72,6 +72,22 @@ app.patch('/api/v1/tours/:id', (request, response) => {
     })
 });
 
+app.delete('/api/v1/tours/:id', (request, response) => {
+    const id = request.params.id * 1;
+    const tour = tourData.find(element => element.id === id);
+    if (!tour) {
+        return response.status(404).json({
+            status: 'failed',
+            message: 'invalid id'
+        })
+    }
+
+    response.status(204).json({
+        status: 'delete sim success',
+        data: null
+    })
+});
+
 const port = 3000;
 app.listen(port, () => {
     console.log(`app running on port: ${port}`)
