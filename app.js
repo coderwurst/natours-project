@@ -54,6 +54,24 @@ app.post('/api/v1/tours', (request, response) => {
     });
 });
 
+app.patch('/api/v1/tours/:id', (request, response) => {
+    const id = request.params.id * 1;
+    const tour = tourData.find(element => element.id === id);
+    if (!tour) {
+        return response.status(404).json({
+            status: 'failed',
+            message: 'invalid id'
+        })
+    }
+
+    response.status(200).json({
+        status: 'patch sim success',
+        data: {
+            tour: tour
+        }
+    })
+});
+
 const port = 3000;
 app.listen(port, () => {
     console.log(`app running on port: ${port}`)
