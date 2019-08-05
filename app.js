@@ -3,7 +3,17 @@ const express = require('express');
 
 const app = express();
 
-app.use(express.json());        // middleware to add data to request body
+app.use(express.json());                        // middleware to add data to request body
+
+app.use((request, response, next) => {          // custom middleware function
+    console.log('hello from the middleware');
+    next();
+});
+
+app.use((request, response, next) => {
+    request.requestTime = new Date().toISOString();
+    next();
+});
 
 const database = `${__dirname}/dev-data/data/tours-simple.json`;
 
@@ -12,8 +22,10 @@ const tourData = JSON.parse(
 );
 
 const getAllTours = (request, response) => {
+    console.log(request.requestTime)
     response.status(200).json({
         status: 'success',
+        requestedAt: request.requestTime,
         results: tourData.length,
         data: {
             tours: tourData
