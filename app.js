@@ -1,8 +1,10 @@
 const fs = require('fs')
 const express = require('express');
+const morgan = require('morgan')
 
 const app = express();
-
+// middleware
+app.use(morgan('dev'));                         // https://github.com/expressjs/morgan/blob/master/index.js
 app.use(express.json());                        // middleware to add data to request body
 
 app.use((request, response, next) => {          // custom middleware function
@@ -21,6 +23,7 @@ const tourData = JSON.parse(
     fs.readFileSync(database)
 );
 
+// route handlers
 const getAllTours = (request, response) => {
     console.log(request.requestTime)
     response.status(200).json({
@@ -100,6 +103,7 @@ const deleteTour = (request, response) => {
     })
 };
 
+// routes
 app.route('/api/v1/tours')
     .get(getAllTours)
     .post(createTour);
@@ -109,6 +113,7 @@ app.route('/api/v1/tours/:id')
     .patch(updateTour)
     .delete(deleteTour);
 
+// server
 const port = 3000;
 app.listen(port, () => {
     console.log(`app running on port: ${port}`)
