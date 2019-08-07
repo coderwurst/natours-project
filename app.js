@@ -10,6 +10,7 @@ const app = express(); // https://expressjs.com/en/api.html
 app.use(morgan('dev')); // https://github.com/expressjs/morgan/blob/master/index.js
 
 app.use(express.json()); // middleware to add data to request body
+app.use(express.static(`${__dirname}/public`));
 
 app.use((request, response, next) => {
   // custom middleware function
