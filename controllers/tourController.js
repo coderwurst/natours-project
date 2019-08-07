@@ -20,7 +20,7 @@ exports.checkBody = (request, response, next) => {
   if (request.body.name == null || request.body.price == null) {
     return response.status(400).json({
       status: 'failed',
-      message: 'invalid body'
+      message: 'missing name or price'
     });
   }
   next();
@@ -56,7 +56,7 @@ exports.createTour = (request, response) => {
 
   fs.writeFile(database, JSON.stringify(tourData), err => {
     response.status(201).json({
-      status: 'success',
+      status: 'create success',
       data: {
         tour: newTour
       }
