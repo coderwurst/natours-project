@@ -7,10 +7,12 @@ const userRouter = require('./routes/userRoutes');
 const app = express(); // https://expressjs.com/en/api.html
 
 // middlewares
-app.use(morgan('dev')); // https://github.com/expressjs/morgan/blob/master/index.js
+if (process.env.NODE_ENV === 'development') {
+  app.use(morgan('dev')); // https://github.com/expressjs/morgan/blob/master/index.js
+}
 
 app.use(express.json()); // middleware to add data to request body
-app.use(express.static(`${__dirname}/public`));
+app.use(express.static(`${__dirname}/public`)); // serving static files
 
 app.use((request, response, next) => {
   // custom middleware function
