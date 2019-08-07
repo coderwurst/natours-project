@@ -5,11 +5,22 @@ const database = `${__dirname}/../dev-data/data/tours-simple.json`;
 const tourData = JSON.parse(fs.readFileSync(database));
 
 exports.checkId = (request, response, next, value) => {
-  console.log('hello from middleware 3');
+  console.log('hello from middleware checkId');
   if (value > tourData.length) {
     return response.status(404).json({
       status: 'failed',
       message: 'invalid id'
+    });
+  }
+  next();
+};
+
+exports.checkBody = (request, response, next) => {
+  console.log('hello from middleware check body');
+  if (request.body.name == null || request.body.price == null) {
+    return response.status(400).json({
+      status: 'failed',
+      message: 'invalid body'
     });
   }
   next();
