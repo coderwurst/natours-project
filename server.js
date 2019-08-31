@@ -34,6 +34,21 @@ const tourSchema = new mongoose.Schema({
 
 const Tour = new mongoose.model('Tour', tourSchema);
 
+const testTour = new Tour({
+  name: 'The Park Camper',
+  rating: 4.5,
+  price: 297
+});
+
+testTour
+  .save()
+  .then(document => {
+    console.log(document);
+  })
+  .catch(error => {
+    console.log(`ERROR: ${error}`);
+  });
+
 // config file counts for all further files
 const app = require('./app');
 
