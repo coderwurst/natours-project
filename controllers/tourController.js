@@ -22,13 +22,22 @@ exports.getTour = (request, response) => {
   }); */
 };
 
-exports.createTour = (request, response) => {
-  response.status(201).json({
-    status: 'create success'
-    /*  data: {
-      tour: newTour
-    } */
-  });
+exports.createTour = async (request, response) => {
+  try {
+    const newTour = await Tour.create(request.body);
+
+    response.status(201).json({
+      status: 'create success',
+      data: {
+        tour: newTour
+      }
+    });
+  } catch (error) {
+    response.status(400).json({
+      status: 'create failed',
+      message: 'invalid data set'
+    });
+  }
 };
 
 exports.updateTour = (request, response) => {
