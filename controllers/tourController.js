@@ -1,21 +1,5 @@
 const Tour = require('./../models/tourModel.js');
 
-/*
-const database = `${__dirname}/../dev-data/data/tours-simple.json`;
-const tourData = JSON.parse(fs.readFileSync(database));
-*/
-
-exports.checkBody = (request, response, next) => {
-  console.log('hello from middleware check body');
-  if (request.body.name == null || request.body.price == null) {
-    return response.status(400).json({
-      status: 'failed',
-      message: 'missing name or price'
-    });
-  }
-  next();
-};
-
 exports.getAllTours = (request, response) => {
   response.status(200).json({
     status: 'success'
@@ -39,19 +23,12 @@ exports.getTour = (request, response) => {
 };
 
 exports.createTour = (request, response) => {
-  /* const newId = tourData[tourData.length - 1].id + 1;
-  const newTour = Object.assign({ id: newId }, request.body); // Object.assign to merge 2 objects
-
-  tourData.push(newTour);
-
-  fs.writeFile(database, JSON.stringify(tourData), err => {
-    response.status(201).json({
-      status: 'create success',
-      data: {
-        tour: newTour
-      }
-    });
-  }); */
+  response.status(201).json({
+    status: 'create success'
+    /*  data: {
+      tour: newTour
+    } */
+  });
 };
 
 exports.updateTour = (request, response) => {
