@@ -16,39 +16,6 @@ mongoose
   })
   .then(() => console.log('DB connection successful'));
 
-const tourSchema = new mongoose.Schema({
-  name: {
-    type: String,
-    required: [true, 'name is required'],
-    unique: true
-  },
-  rating: {
-    type: Number,
-    default: 4.5
-  },
-  price: {
-    type: Number,
-    required: [true, 'price must be provided']
-  }
-});
-
-const Tour = new mongoose.model('Tour', tourSchema);
-
-const testTour = new Tour({
-  name: 'The Park Camper',
-  rating: 4.5,
-  price: 297
-});
-
-testTour
-  .save()
-  .then(document => {
-    console.log(document);
-  })
-  .catch(error => {
-    console.log(`ERROR: ${error}`);
-  });
-
 // config file counts for all further files
 const app = require('./app');
 
