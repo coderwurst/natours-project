@@ -76,9 +76,18 @@ exports.updateTour = async (request, response) => {
   }
 };
 
-exports.deleteTour = (request, response) => {
-  response.status(204).json({
-    status: 'delete sim success',
-    data: null
-  });
+exports.deleteTour = async (request, response) => {
+  try {
+    await Tour.findByIdAndDelete(request.params.id);
+
+    response.status(204).json({
+      status: 'success',
+      data: null
+    });
+  } catch (error) {
+    response.status(400).json({
+      status: 'error',
+      message: 'tour could not be deleted'
+    });
+  }
 };
