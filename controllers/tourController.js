@@ -55,15 +55,25 @@ exports.createTour = async (request, response) => {
   }
 };
 
-exports.updateTour = (request, response) => {
-  const id = request.params.id * 1;
-  /* const tour = tourData.find(element => element.id === id);
-  response.status(200).json({
-    status: 'patch sim success',
-    data: {
-      tour: tour
-    }
-  }); */
+exports.updateTour = async (request, response) => {
+  try {
+    const tour = await Tour.findByIdAndUpdate(request.params.id, request.body, {
+      new: true, // returns updated document
+      runValidators: true // runs checks against schema
+    });
+
+    response.status(200).json({
+      status: 'success',
+      data: {
+        tour: tour
+      }
+    });
+  } catch (error) {
+    response.status(400).json({
+      status: 'error',
+      message: 'tour could not be updated'
+    });
+  }
 };
 
 exports.deleteTour = (request, response) => {
