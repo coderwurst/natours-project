@@ -2,13 +2,14 @@ const Tour = require('./../models/tourModel.js');
 
 exports.getAllTours = async (request, response) => {
   try {
+    // build query
     const queryObject = { ...request.query };
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
     excludedFields.forEach(element => {
       delete queryObject[element];
     });
 
-    const allTours = await Tour.find(queryObject);
+    const query = Tour.find(queryObject);
 
     // const allTours = await Tour.find()
     //   .where('duration')
@@ -16,11 +17,15 @@ exports.getAllTours = async (request, response) => {
     //   .where('difficulty')
     //   .equals('easy');
 
+    // execute query
+    const tours = await query;
+
+    // send response
     response.status(200).json({
       status: 'success',
-      results: allTours.length,
+      results: tours.length,
       data: {
-        tours: allTours
+        tours: tours
       }
     });
   } catch (error) {
