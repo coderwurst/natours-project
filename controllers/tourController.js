@@ -42,6 +42,13 @@ exports.getAllTours = async (request, response) => {
     const skip = (page - 1) * limit;
     query = query.skip(skip).limit(limit);
 
+    if (request.query.page) {
+      const numberTours = await Tour.countDocuments();
+      if (skip >= numberTours) {
+        throw new Error('This page does not exist');
+      }
+    }
+
     // execute query
     const tours = await query;
 
@@ -62,7 +69,7 @@ exports.getAllTours = async (request, response) => {
   } catch (error) {
     response.status(400).json({
       status: 'error',
-      message: 'tours could not be retrieved'
+      message: error
     });
   }
 };
