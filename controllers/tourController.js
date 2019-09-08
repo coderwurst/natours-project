@@ -2,7 +2,6 @@ const Tour = require('./../models/tourModel.js');
 
 exports.getAllTours = async (request, response) => {
   try {
-    console.log(request.query);
     // build query
     const queryObject = { ...request.query };
     // 1. filter out functional strings
@@ -16,7 +15,6 @@ exports.getAllTours = async (request, response) => {
       return `$${match}`;
     });
 
-    console.log(JSON.parse(queryString));
     let query = Tour.find(JSON.parse(queryString));
 
     // 3. sort by url param passed in
