@@ -5,12 +5,12 @@ exports.getAllTours = async (request, response) => {
     console.log(request.query);
     // build query
     const queryObject = { ...request.query };
-    // filter out functional strings
+    // 1. filter out functional strings
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
     excludedFields.forEach(element => {
       delete queryObject[element];
     });
-    // filter and replace comparison operators
+    // 2. filter and replace comparison operators
     let queryString = JSON.stringify(queryObject);
     queryString = queryString.replace(/\b(gte|gte|gt|lt)\b/g, match => {
       return `$${match}`;
@@ -19,12 +19,20 @@ exports.getAllTours = async (request, response) => {
     console.log(JSON.parse(queryString));
     let query = Tour.find(JSON.parse(queryString));
 
-    // sort by url param passed in
+    // 3. sort by url param passed in
     if (request.query.sort) {
-      const sortBy = request.query.sort.split('').join(' ');
+      const sortBy = request.query.sort.split(',').join(' ');
       query = query.sort(sortBy);
     } else {
       query = query.sort('-createdAt');
+    }
+
+    // 4. field limiting
+    if (request.query.fields) {
+      const fields = request.query.fields.split(',').join(' ');
+      query = query.select(fields);
+    } else {
+      query = query.select('-__v');
     }
 
     // execute query
