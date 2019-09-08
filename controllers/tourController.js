@@ -5,7 +5,7 @@ exports.getAllTours = async (request, response) => {
     console.log(request.query);
     // build query
     const queryObject = { ...request.query };
-    // filter out protected strings
+    // filter out functional strings
     const excludedFields = ['page', 'sort', 'limit', 'fields'];
     excludedFields.forEach(element => {
       delete queryObject[element];
@@ -17,7 +17,15 @@ exports.getAllTours = async (request, response) => {
     });
 
     console.log(JSON.parse(queryString));
-    const query = Tour.find(JSON.parse(queryString));
+    let query = Tour.find(JSON.parse(queryString));
+
+    // sort by url param passed in
+    if (request.query.sort) {
+      const sortBy = request.query.sort.split('').join(' ');
+      query = query.sort(sortBy);
+    } else {
+      query = query.sort('-createdAt');
+    }
 
     // execute query
     const tours = await query;
