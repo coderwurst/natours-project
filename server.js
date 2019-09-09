@@ -28,12 +28,6 @@ process.on('unhandledRejection', (reason, promise) => {
   console.log('Unhandled Rejection at:', promise, 'reason:', reason);
 });
 
-process.on('warning', warning => {
-  console.warn(warning.name);
-  console.warn(warning.message);
-  console.warn(warning.stack);
-});
-
 const port = process.env.PORT;
 app.listen(port, () => {
   console.log(`app running on port: ${port}`);
