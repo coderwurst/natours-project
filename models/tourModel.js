@@ -70,6 +70,7 @@ tourSchema.virtual('durationWeeks').get(function() {
   return this.duration / 7;
 });
 
+// MIDDLEWARE EXAMPLES
 // document middleware: pre-save hook - runs before .save() and create() (not .insertMany())
 tourSchema.pre('save', function(next) {
   this.slug = slugify(this.name, { lower: true });
@@ -92,6 +93,13 @@ tourSchema.pre(/^find/, function(next) {
 
 tourSchema.post(/^find/, function(document, next) {
   console.log(`Query took ${Date.now() - this.start} milliseconds!`);
+  next();
+});
+
+// aggregation middleware - filter our secret tours for aggregations
+tourSchema.pre('aggregate', function(next) {
+  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+  console.log(this.pipeline());
   next();
 });
 
