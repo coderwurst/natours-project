@@ -42,7 +42,16 @@ const tourSchema = new mongoose.Schema(
       type: Number,
       required: [true, 'price must be provided']
     },
-    priceDiscount: Number,
+    priceDiscount: {
+      type: Number,
+      validate: {
+        message: 'discount price ({VALUE}) should be below regular price',
+        validator: function(inputValue) {
+          // mongoose gotcha - this. keyword only works on new doc generate (not on updates)
+          return inputValue < this.price;
+        }
+      }
+    },
     summary: {
       type: String,
       trim: true,
