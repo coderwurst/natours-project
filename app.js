@@ -4,6 +4,9 @@ const morgan = require('morgan');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 
+const AppError = require('./utils/appError');
+const globalErrorHandler = require('./controllers/errorController');
+
 const app = express(); // https://expressjs.com/en/api.html
 
 // middlewares
@@ -27,22 +30,10 @@ app.use('/api/v1/users', userRouter);
 
 // if code reaches here, there were no routers to match the request
 app.all('*', (request, response, next) => {
-  const error = new Error(`can't find ${request.originalUrl}!`);
-  error.status = 'fail';
-  error.statusCode = 404;
-
-  next(error);
+  next(new AppError(`can't find ${request.originalUrl}!`, 404));
 });
 
 // global error handling in middleware
-app.use((error, request, response, next) => {
-  error.statusCode = error.statusCode || 500;
-  error.status = error.status || 'error';
-
-  response.status(error.statusCode).json({
-    status: error.status,
-    message: error.message
-  });
-});
+app.use(globalErrorHandler);
 
 module.exports = app;
