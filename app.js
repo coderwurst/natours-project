@@ -27,9 +27,21 @@ app.use('/api/v1/users', userRouter);
 
 // if code reaches here, there were no routers to match the request
 app.all('*', (request, response, next) => {
-  response.status(404).json({
-    status: 'fail',
-    message: `can't find ${request.originalUrl}!`
+  const error = new Error(`can't find ${request.originalUrl}!`);
+  error.status = 'fail';
+  error.statusCode = 404;
+
+  next(error);
+});
+
+// global error handling in middleware
+app.use((error, request, response, next) => {
+  error.statusCode = error.statusCode || 500;
+  error.status = error.status || 'error';
+
+  response.status(error.statusCode).json({
+    status: error.status,
+    message: error.message
   });
 });
 
