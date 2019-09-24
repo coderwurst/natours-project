@@ -5,6 +5,12 @@ const handleCaseErrorDB = error => {
   return new AppError(message, 400);
 };
 
+const handleDuplicateFieldNames = error => {
+  const value = error.errmsg.match(/(["'])(\\?.)*?\1/);
+  const message = `Duplicate field value: ${value}, please use a unique value`;
+  return new AppError(message, 400);
+};
+
 const sendErrorDev = (error, response) => {
   response.status(error.statusCode).json({
     status: error.status,
@@ -43,6 +49,8 @@ module.exports = (error, request, response, next) => {
 
     if (err.name === 'CastError') {
       err = handleCaseErrorDB(err);
+    } else if (err.code === 11000) {
+      err = handleDuplicateFieldNames(err);
     }
 
     sendErrorProd(err, response);
