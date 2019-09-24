@@ -5,9 +5,15 @@ const handleCaseErrorDB = error => {
   return new AppError(message, 400);
 };
 
-const handleDuplicateFieldNames = error => {
+const handleDuplicateFieldNamesDB = error => {
   const value = error.errmsg.match(/(["'])(\\?.)*?\1/);
   const message = `Duplicate field value: ${value}, please use a unique value`;
+  return new AppError(message, 400);
+};
+
+const handleValidationErrorDB = error => {
+  const errors = Object.values(error.errors).map(element => element.message);
+  const message = `Invalid input data: ${errors.join('. ')}`;
   return new AppError(message, 400);
 };
 
@@ -49,8 +55,14 @@ module.exports = (error, request, response, next) => {
 
     if (err.name === 'CastError') {
       err = handleCaseErrorDB(err);
-    } else if (err.code === 11000) {
-      err = handleDuplicateFieldNames(err);
+    }
+
+    if (err.code === 11000) {
+      err = handleDuplicateFieldNamesDB(err);
+    }
+
+    if (err.name === 'ValidationError') {
+      err = handleValidationErrorDB(err);
     }
 
     sendErrorProd(err, response);
