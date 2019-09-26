@@ -17,18 +17,19 @@ mongoose
   .then(() => {
     console.log('DB connection successful');
   });
-/*.catch(error => {
-    console.log(`Connection failure: ${error}`);
-  });*/
 
 // config file counts for all further files
 const app = require('./app');
 
-process.on('unhandledRejection', (reason, promise) => {
-  console.log('Unhandled Rejection at:', promise, 'reason:', reason);
+const port = process.env.PORT;
+const server = app.listen(port, () => {
+  console.log(`app running on port: ${port}`);
 });
 
-const port = process.env.PORT;
-app.listen(port, () => {
-  console.log(`app running on port: ${port}`);
+process.on('unhandledRejection', error => {
+  console.log(`ERROR: ${error.name}, ${error.message}`);
+  console.log('Unhandled Rejection Error! Shutting down...');
+  server.close(() => {
+    process.exit(1);
+  });
 });
