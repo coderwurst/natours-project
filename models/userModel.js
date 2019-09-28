@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const validator = require('validator');
+const bcrypt = require('bcryptjs');
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -23,8 +24,26 @@ const userSchema = new mongoose.Schema({
   },
   passwordConfirm: {
     type: String,
-    required: [true, 'confirmed password is required']
+    required: [true, 'confirmed password is required'],
+    validate: {
+      // custom validators only work on create and save!
+      validator: function(element) {
+        return element === this.password;
+      },
+      message: 'passwords do not match'
+    }
   }
+});
+
+userSchema.pre('save', async function(next) {
+  // only run when password was added / modified
+  if (!this.isModified('password')) return next();
+
+  // add salt and hast (cost 12) and delete the no longer needed confirm field
+  this.password = await bcrypt.hash(this.password, 12);
+  this.passwordConfirm = undefined;
+
+  next();
 });
 
 const User = new mongoose.model('User', userSchema);
