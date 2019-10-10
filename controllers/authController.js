@@ -101,3 +101,24 @@ exports.restrictTo = (...roles) => {
     next();
   };
 };
+
+exports.forgotPassword = catchAsync(async (request, response, next) => {
+  // 1. get user based on email address
+  const currentUser = await User.findOne({ email: request.body.email });
+  if (!currentUser) {
+    return next(new AppError('user is not known'), 404);
+  }
+
+  // 2. generate token and save to user
+  const resetToken = currentUser.generateResetToken();
+  await currentUser.save({ validateBeforeSave: false });
+
+  // 3. send to users email
+  // next();
+});
+
+exports.resetPassword = (request, response, next) => {
+  // TODO: start here
+  // console.log('password reset middleware');
+  // next();
+};
