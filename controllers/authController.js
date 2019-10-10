@@ -14,6 +14,7 @@ exports.signup = catchAsync(async (request, response, next) => {
   const newUser = await User.create({
     name: request.body.name,
     email: request.body.email,
+    role: request.body.role,
     password: request.body.password,
     passwordConfirm: request.body.passwordConfirm,
     passwordChangedAt: request.body.passwordChangedAt
@@ -74,17 +75,29 @@ exports.protect = catchAsync(async (request, response, next) => {
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
 
   // 3. check if user still exists
-  const user = await User.findById(decoded.id);
-  if (!user) {
+  const currentUser = await User.findById(decoded.id);
+  if (!currentUser) {
     return next(new AppError('User not found!', 401));
   }
 
   // 4. check if user changed password after token creation
-  if (user.changedPasswordAfter(decoded.iat)) {
+  if (currentUser.changedPasswordAfter(decoded.iat)) {
     return next(new AppError('User recently changed password!', 401));
   }
 
   // 5. allow access to protected route
-  request.user = user;
+  request.user = currentUser;
   next();
 });
+
+// closure example
+exports.restrictTo = (...roles) => {
+  return (request, response, next) => {
+    // role stored in protect middleware on request
+    if (!roles.includes(request.user.role)) {
+      return next(new AppError('no permission to perform action', 403));
+    }
+
+    next();
+  };
+};
