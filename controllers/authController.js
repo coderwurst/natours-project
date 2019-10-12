@@ -1,3 +1,4 @@
+const crypto = require('crypto');
 const { promisify } = require('util');
 const jwt = require('jsonwebtoken');
 
@@ -138,7 +139,6 @@ exports.forgotPassword = catchAsync(async (request, response, next) => {
     currentUser.passwordResetToken = undefined;
     currentUser.passwordResetExpires = undefined;
     await currentUser.save({ validateBeforeSave: false });
-    console.log(error);
     return next(
       new AppError(
         'There was an error when sending the reset mail. Try again later!',
@@ -148,8 +148,38 @@ exports.forgotPassword = catchAsync(async (request, response, next) => {
   }
 });
 
-exports.resetPassword = (request, response, next) => {
-  // TODO: start here
-  // console.log('password reset middleware');
-  // next();
-};
+exports.resetPassword = catchAsync(async (request, response, next) => {
+  // 1. get user based on token
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(request.params.token)
+    .digest('hex');
+
+  const user = await User.findOne({
+    passwordResetToken: hashedToken,
+    passwordResetExpires: { $gt: Date.now() }
+  });
+
+  if (!user) {
+    return next(new AppError('Token invalid'), 400);
+  }
+
+  // 2. set new password if token has not expired
+  user.password = request.body.password;
+  user.passwordConfirm = request.body.passwordConfirm;
+  // changedPasswordAt updated via middleware in userModel
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  await user.save();
+
+  // 3. log user in (send jwt)
+  const token = signToken(user._id);
+
+  response.status(201).json({
+    status: 'success',
+    token,
+    data: {
+      user: user
+    }
+  });
+});
