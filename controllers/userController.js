@@ -81,8 +81,8 @@ exports.updateUser = catchAsync(async (request, response, next) => {
   });
 });
 
-exports.deleteUser = catchAsync(async (request, response) => {
-  await User.findByIdAndDelete(request.params.id);
+exports.deleteUser = catchAsync(async (request, response, next) => {
+  await User.findByIdAndUpdate(request.user.id, { active: false });
 
   response.status(204).json({
     status: 'success',

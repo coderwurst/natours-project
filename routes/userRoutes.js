@@ -25,12 +25,10 @@ router
   .get(userController.getAllUsers)
   .post(userController.createUser);
 
-router
-  .route('/:id')
-  .get(userController.getUser)
-  .delete(userController.deleteUser);
+router.route('/:id').get(userController.getUser);
 
 // updates
 router.patch('/updateUser', authController.protect, userController.updateUser);
+router.delete('/deleteUser', authController.protect, userController.deleteUser);
 
 module.exports = router;
