@@ -13,6 +13,18 @@ const signToken = id => {
   });
 };
 
+const createAndSendToken = (user, statusCode, response) => {
+  const token = signToken(user._id);
+
+  response.status(statusCode).json({
+    status: 'success',
+    token,
+    data: {
+      user: user
+    }
+  });
+};
+
 exports.signup = catchAsync(async (request, response, next) => {
   const newUser = await User.create({
     name: request.body.name,
@@ -23,15 +35,7 @@ exports.signup = catchAsync(async (request, response, next) => {
     passwordChangedAt: request.body.passwordChangedAt
   });
 
-  const token = signToken(newUser._id);
-
-  response.status(201).json({
-    status: 'success',
-    token,
-    data: {
-      user: newUser
-    }
-  });
+  createAndSendToken(newUser, 201, response);
 });
 
 exports.login = catchAsync(async (request, response, next) => {
@@ -50,14 +54,7 @@ exports.login = catchAsync(async (request, response, next) => {
     return next(new AppError('incorrect email or password', 401));
   }
 
-  // create token
-  const token = signToken(user._id);
-
-  // send to client
-  response.status(200).json({
-    status: 'success',
-    token
-  });
+  createAndSendToken(user, 200, response);
 });
 
 exports.protect = catchAsync(async (request, response, next) => {
@@ -172,14 +169,29 @@ exports.resetPassword = catchAsync(async (request, response, next) => {
   user.passwordResetExpires = undefined;
   await user.save();
 
-  // 3. log user in (send jwt)
-  const token = signToken(user._id);
+  createAndSendToken(user, 200, response);
+});
 
-  response.status(201).json({
-    status: 'success',
-    token,
-    data: {
-      user: user
-    }
-  });
+exports.updatePassword = catchAsync(async (request, response, next) => {
+  const { currentPassword, newPassword, newPasswordConfirm } = request.body;
+
+  // 1. check if request valid
+  if (!currentPassword || !newPassword || !newPasswordConfirm) {
+    return next(new AppError('please provide all required information', 400));
+  }
+
+  // 2. get user from collection with (usually hidden) password
+  const user = await User.findById(request.user.id).select('+password');
+
+  // 3. check if currentPassword is correct
+  if (!user || !(await user.correctPassword(currentPassword, user.password))) {
+    return next(new AppError('incorrect email or password', 401));
+  }
+
+  // 4. update password to user (encryption happens in middleware)
+  user.password = newPassword;
+  user.passwordConfirm = newPasswordConfirm;
+  await user.save();
+
+  createAndSendToken(user, 200, response);
 });
