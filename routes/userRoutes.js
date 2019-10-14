@@ -7,6 +7,7 @@ const router = express.Router();
 
 router.param('id', userController.checkId);
 
+// authentication
 router.post('/signup', authController.signup);
 router.post('/login', authController.login);
 
@@ -27,7 +28,9 @@ router
 router
   .route('/:id')
   .get(userController.getUser)
-  .patch(userController.updateUser)
   .delete(userController.deleteUser);
+
+// updates
+router.patch('/updateUser', authController.protect, userController.updateUser);
 
 module.exports = router;

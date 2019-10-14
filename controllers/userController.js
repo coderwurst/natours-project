@@ -1,5 +1,17 @@
 const User = require('../models/userModel');
+
+const AppError = require('./../utils/appError');
 const catchAsync = require('./../utils/catchAsync');
+
+const filterObject = (body, ...allowedFields) => {
+  const newObject = {};
+  Object.keys(body).forEach(element => {
+    if (allowedFields.includes(element)) {
+      newObject[element] = body[element];
+    }
+  });
+  return newObject;
+};
 
 exports.checkId = (request, response, next, value) => {
   console.log('hello from middleware 3');
@@ -39,16 +51,32 @@ exports.createUser = catchAsync(async (request, response) => {
   });
 });
 
-exports.updateUser = catchAsync(async (request, response) => {
-  const result = await User.findByIdAndUpdate(request.params.id, request.body, {
-    new: true,
-    runValidators: true
-  });
+exports.updateUser = catchAsync(async (request, response, next) => {
+  // 1. prevent user from trying to update password
+  if (request.body.password || request.body.passwordConfirm) {
+    return next(
+      new AppError(
+        'Password cannot be updated at this endpoint - please use /updatePassword',
+        400
+      )
+    );
+  }
+
+  // 2. update user document, filtering out only fields that are able to be udpated
+  const filteredBody = filterObject(request.body, 'name', 'email');
+  const updatedUser = await User.findByIdAndUpdate(
+    request.user.id,
+    filteredBody,
+    {
+      new: true,
+      runValidators: true
+    }
+  );
 
   response.status(200).json({
     status: 'success',
     data: {
-      user: result
+      user: updatedUser
     }
   });
 });
