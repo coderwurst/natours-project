@@ -1,8 +1,9 @@
 const express = require('express');
 const helmet = require('helmet');
+const hpp = require('hpp');
+const mongoSanitize = require('express-mongo-sanitize');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
-const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 
 const tourRouter = require('./routes/tourRoutes');
@@ -41,6 +42,20 @@ app.use(xss());
 
 // serving static files
 app.use(express.static(`${__dirname}/public`));
+
+// prevent param pollution ?sort=duration&sort=price but allow 2 sorts for whitelisted items
+app.use(
+  hpp({
+    whitelist: [
+      'duration',
+      'ratingsQuantity',
+      'ratingsAverage',
+      'maxGroupSize',
+      'difficulty',
+      'price'
+    ]
+  })
+);
 
 // mount the routers, applying the specified middleware routers
 app.use('/api/v1/tours', tourRouter);
