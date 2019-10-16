@@ -15,6 +15,21 @@ const signToken = id => {
 
 const createAndSendToken = (user, statusCode, response) => {
   const token = signToken(user._id);
+  // send cookie to expire in 90 days over a secure connection (prod), not able to be modded by browser
+  const cookieOptions = {
+    expires: new Date(
+      Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
+    ),
+    http: true
+  };
+
+  if (process.env.NODE_ENV === 'production') {
+    cookieOptions.secure = true;
+  }
+  response.cookie('jwt', token, cookieOptions);
+
+  // remove password from user object on create
+  user.password = undefined;
 
   response.status(statusCode).json({
     status: 'success',
