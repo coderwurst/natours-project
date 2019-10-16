@@ -1,6 +1,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
@@ -11,10 +12,15 @@ const globalErrorHandler = require('./controllers/errorController');
 const app = express(); // https://expressjs.com/en/api.html
 
 // middlewares - GLOBAL SCOPE
+// set security http headers
+app.use(helmet());
+
+// dev logging
 if (process.env.NODE_ENV === 'development') {
   app.use(morgan('dev')); // https://github.com/expressjs/morgan/blob/master/index.js
 }
 
+// prevent dos attacks from single IP
 const limiter = rateLimit({
   max: 100,
   windowMs: 60 * 60 * 1000,
@@ -22,8 +28,11 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-app.use(express.json()); // middleware to add data to request body
-app.use(express.static(`${__dirname}/public`)); // serving static files
+// body parser - reading data from body into request.body
+app.use(express.json());
+
+// serving static files
+app.use(express.static(`${__dirname}/public`));
 
 // mount the routers, applying the specified middleware routers
 app.use('/api/v1/tours', tourRouter);
