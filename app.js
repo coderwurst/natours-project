@@ -28,8 +28,8 @@ const limiter = rateLimit({
 });
 app.use('/api', limiter);
 
-// body parser - reading data from body into request.body
-app.use(express.json());
+// body parser - reading data from body into request.body to 10KB
+app.use(express.json({ limit: '10kb' }));
 
 // serving static files
 app.use(express.static(`${__dirname}/public`));
@@ -37,6 +37,13 @@ app.use(express.static(`${__dirname}/public`));
 // mount the routers, applying the specified middleware routers
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+
+// test middleware to view request headers
+app.use((request, response, next) => {
+  request.requestTime = new Date().toISOString();
+  // console.log(request.headers);
+  next();
+});
 
 // if code reaches here, there were no routers to match the request
 app.all('*', (request, response, next) => {
