@@ -31,10 +31,7 @@ exports.getAllTours = catchAsync(async (request, response, next) => {
 });
 
 exports.getTour = catchAsync(async (request, response, next) => {
-  const tour = await Tour.findById(request.params.id).populate({
-    path: 'guides',
-    select: '-__v -passwordChangedAt'
-  });
+  const tour = await Tour.findById(request.params.id);
   // alternatively - const tour = await Tour.findOne({_id: request.params.id});
 
   if (!tour) {
