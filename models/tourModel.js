@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 
-const user = require('./userModel.js');
+// const user = require('./userModel.js');
 
 const tourSchema = new mongoose.Schema(
   {
@@ -102,7 +102,12 @@ const tourSchema = new mongoose.Schema(
         day: Number
       }
     ],
-    guides: Array
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User'
+      }
+    ]
   },
   {
     toJSON: { virtuals: true },
@@ -122,6 +127,8 @@ tourSchema.pre('save', function(next) {
   next(); // call next middleware in stack
 });
 
+/*
+embedded user example
 tourSchema.pre('save', async function(next) {
   const guidesPromises = this.guides.map(async idElement =>
     user.findById(idElement)
@@ -130,12 +137,13 @@ tourSchema.pre('save', async function(next) {
   this.guides = await Promise.all(guidesPromises);
   next();
 });
+*/
 
-// document middleware: post-save hook - runs after pres have been completed, includes the saved document
-// tourSchema.post('save', function(document, next) {
-//   console.log(document);
-//   next();
-// });
+/* document middleware: post-save hook - runs after pres have been completed, includes the saved document
+  tourSchema.post('save', function(document, next) {
+  console.log(document);
+  next();
+});*/
 
 // query middleware: pre-find hook - filters out hidden tours from DB, for all querys with find at start (findOne, find, find and update)
 tourSchema.pre(/^find/, function(next) {
