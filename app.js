@@ -8,6 +8,7 @@ const xss = require('xss-clean');
 
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
+const reviewRouter = require('./routes/reviewRoutes');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -60,6 +61,7 @@ app.use(
 // mount the routers, applying the specified middleware routers
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
+app.use('/api/v1/reviews', reviewRouter);
 
 // test middleware to view request headers
 app.use((request, response, next) => {
@@ -70,7 +72,7 @@ app.use((request, response, next) => {
 
 // if code reaches here, there were no routers to match the request
 app.all('*', (request, response, next) => {
-  next(new AppError(`can't find ${request.originalUrl}!`, 404));
+  next(new AppError(`can't find ${request.originalUrl}`, 404));
 });
 
 // global error handling in middleware
