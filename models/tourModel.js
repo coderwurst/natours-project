@@ -120,6 +120,13 @@ tourSchema.virtual('durationWeeks').get(function() {
   return this.duration / 7;
 });
 
+// pull reviews with parent reference for each tour on findOne -> see tourController getTour ...populate
+tourSchema.virtual('reviews', {
+  ref: 'Review',
+  foreignField: 'tour', // link in review to this tour
+  localField: '_id' // link form this model to review
+});
+
 // MIDDLEWARE EXAMPLES
 // document middleware: pre-save hook - runs before .save() and create() (not .insertMany())
 tourSchema.pre('save', function(next) {
