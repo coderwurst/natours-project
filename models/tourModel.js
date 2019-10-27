@@ -120,7 +120,7 @@ tourSchema.virtual('durationWeeks').get(function() {
   return this.duration / 7;
 });
 
-// pull reviews with parent reference for each tour on findOne -> see tourController getTour ...populate
+// pull reviews with the parent reference for each tourController.getTour ...populate
 tourSchema.virtual('reviews', {
   ref: 'Review',
   foreignField: 'tour', // link in review to this tour

@@ -1,7 +1,8 @@
 const express = require('express');
 
-const tourController = require('../controllers/tourController');
 const authController = require('../controllers/authController');
+const tourController = require('../controllers/tourController');
+const reviewController = require('../controllers/reviewController');
 
 const router = express.Router();
 
@@ -27,6 +28,15 @@ router
     authController.protect,
     authController.restrictTo('admin', 'lead-guide'),
     tourController.deleteTour
+  );
+
+// nested route to add review to current tour
+router
+  .route('/:tourId/reviews')
+  .post(
+    authController.protect,
+    authController.restrictTo('user'),
+    reviewController.createReview
   );
 
 module.exports = router;
