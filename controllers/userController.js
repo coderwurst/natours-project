@@ -18,28 +18,8 @@ exports.checkId = (request, response, next, value) => {
   next();
 };
 
-exports.getAllUsers = catchAsync(async (request, response, next) => {
-  const users = await User.find();
-
-  response.status(200).json({
-    status: 'success',
-    data: {
-      users: users
-    }
-  });
-});
-
-exports.getUser = catchAsync(async (request, response, next) => {
-  const user = await User.findById(request.params.id);
-
-  response.status(200).json({
-    status: 'success',
-    data: {
-      user: user
-    }
-  });
-});
-
+exports.getAllUsers = factory.getAll(User);
+exports.getUser = factory.getOne(User);
 exports.createUser = factory.createOne(User);
 
 exports.updateUser = catchAsync(async (request, response, next) => {
