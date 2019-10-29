@@ -31,4 +31,8 @@ router
   .patch(authController.protect, userController.updateUser)
   .delete(authController.protect, userController.deleteUser);
 
+router
+  .route('./deleteUser')
+  .delete(authController.protect, userController.deleteMe);
+
 module.exports = router;
