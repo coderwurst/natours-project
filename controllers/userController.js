@@ -2,6 +2,7 @@ const User = require('../models/userModel');
 
 const AppError = require('./../utils/appError');
 const catchAsync = require('./../utils/catchAsync');
+const factory = require('./handlerFactory');
 
 const filterObject = (body, ...allowedFields) => {
   const newObject = {};
@@ -14,7 +15,6 @@ const filterObject = (body, ...allowedFields) => {
 };
 
 exports.checkId = (request, response, next, value) => {
-  console.log('hello from middleware 3');
   next();
 };
 
@@ -81,11 +81,4 @@ exports.updateUser = catchAsync(async (request, response, next) => {
   });
 });
 
-exports.deleteUser = catchAsync(async (request, response, next) => {
-  await User.findByIdAndUpdate(request.user.id, { active: false });
-
-  response.status(204).json({
-    status: 'success',
-    data: null
-  });
-});
+exports.deleteUser = factory.deleteOne(User);
