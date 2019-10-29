@@ -47,34 +47,9 @@ exports.getTour = catchAsync(async (request, response, next) => {
   });
 });
 
-exports.createTour = catchAsync(async (request, response, next) => {
-  const newTour = await Tour.create(request.body);
+exports.createTour = factory.createOne(Tour);
 
-  response.status(201).json({
-    status: 'create success',
-    data: {
-      tour: newTour
-    }
-  });
-});
-
-exports.updateTour = catchAsync(async (request, response, next) => {
-  const tour = await Tour.findByIdAndUpdate(request.params.id, request.body, {
-    new: true, // returns updated document
-    runValidators: true // runs checks against schema
-  });
-
-  if (!tour) {
-    return next(new AppError('no tour found with the requested id', 404));
-  }
-
-  response.status(200).json({
-    status: 'success',
-    data: {
-      tour: tour
-    }
-  });
-});
+exports.updateTour = factory.updateOne(Tour);
 
 exports.deleteTour = factory.deleteOne(Tour);
 

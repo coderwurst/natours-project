@@ -40,16 +40,7 @@ exports.getUser = catchAsync(async (request, response, next) => {
   });
 });
 
-exports.createUser = catchAsync(async (request, response) => {
-  const newUser = await User.create(request.body);
-
-  response.status(201).json({
-    status: 'success',
-    data: {
-      user: newUser
-    }
-  });
-});
+exports.createUser = factory.createOne(User);
 
 exports.updateUser = catchAsync(async (request, response, next) => {
   // 1. prevent user from trying to update password
