@@ -14,10 +14,6 @@ const filterObject = (body, ...allowedFields) => {
   return newObject;
 };
 
-exports.checkId = (request, response, next, value) => {
-  next();
-};
-
 exports.getAllUsers = factory.getAll(User);
 exports.getUser = factory.getOne(User);
 exports.createUser = factory.createOne(User);

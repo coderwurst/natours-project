@@ -5,29 +5,21 @@ const authController = require('../controllers/authController');
 
 const router = express.Router();
 
-router.param('id', userController.checkId);
-
-// authentication
+// authentication - open api for all
 router.post('/signup', authController.signup);
 router.post('/login', authController.login);
-
 router.post('/forgotPassword', authController.forgotPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
-// protect to place user on request object
-router.patch(
-  '/updatePassword',
-  authController.protect,
-  authController.updatePassword
-);
 
-router.get(
-  '/me',
-  authController.protect,
-  userController.getMe,
-  userController.getUser
-);
-router.patch('/updateMe', authController.protect, userController.updateMe);
-router.delete('/deleteMe', authController.protect, userController.deleteMe);
+// protect all routes after this point - only  for users
+router.use(authController.protect);
+
+// protect to place user on request object
+router.patch('/updatePassword', authController.updatePassword);
+
+router.get('/me', userController.getMe, userController.getUser);
+router.patch('/updateMe', userController.updateMe);
+router.delete('/deleteMe', userController.deleteMe);
 
 router
   .route('/')
@@ -37,11 +29,9 @@ router
 router
   .route('/:id')
   .get(userController.getUser)
-  .patch(authController.protect, userController.updateUser)
-  .delete(authController.protect, userController.deleteUser);
+  .patch(userController.updateUser)
+  .delete(userController.deleteUser);
 
-router
-  .route('./deleteUser')
-  .delete(authController.protect, userController.deleteMe);
+router.route('./deleteUser').delete(userController.deleteMe);
 
 module.exports = router;
