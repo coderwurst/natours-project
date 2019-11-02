@@ -22,6 +22,7 @@ exports.getAllUsers = factory.getAll(User);
 exports.getUser = factory.getOne(User);
 exports.createUser = factory.createOne(User);
 
+// ADMIN FUNCTIONALITY
 exports.updateUser = catchAsync(async (request, response, next) => {
   // 1. prevent user from trying to update password
   if (request.body.password || request.body.passwordConfirm) {
@@ -52,6 +53,36 @@ exports.updateUser = catchAsync(async (request, response, next) => {
   });
 });
 
+exports.deleteUser = factory.deleteOne(User);
+
+// USER FUNCTIONALITY
+exports.getMe = (request, response, next) => {
+  request.params.id = request.user.id;
+  next();
+};
+
+exports.updateMe = catchAsync(async (request, response, next) => {
+  const filteredBody = filterObject(request.body, 'name', 'email');
+
+  const updatedUser = await User.findByIdAndUpdate(
+    request.user.id,
+    filteredBody,
+    {
+      new: true,
+      runValidators: true
+    }
+  );
+
+  response.status(200).json({
+    status: 'success',
+    data: {
+      user: updatedUser
+    }
+  });
+
+  next();
+});
+
 exports.deleteMe = catchAsync(async (request, response, next) => {
   await User.findByIdAndUpdate(request.user.id, { active: false });
 
@@ -60,5 +91,3 @@ exports.deleteMe = catchAsync(async (request, response, next) => {
     data: null
   });
 });
-
-exports.deleteUser = factory.deleteOne(User);
