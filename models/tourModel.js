@@ -180,7 +180,7 @@ tourSchema.post(/^find/, function(document, next) {
   next();
 });
 
-// aggregation middleware - filter our secret tours for aggregations
+// aggregation pipeline - filter our secret tours for aggregations
 tourSchema.pre('aggregate', function(next) {
   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
   console.log(this.pipeline());
