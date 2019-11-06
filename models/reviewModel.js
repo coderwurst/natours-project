@@ -90,7 +90,8 @@ reviewSchema.post('save', function() {
 
 // update and delete use query middleware and are handled differently
 reviewSchema.pre(/^findOneAnd/, async function(next) {
-  // to gain access to the document in query middleware and not just the query
+  /* to gain access to the document in query middleware and not just the query
+   * and store as this.prop to be accessed in post middleware */
   this.reviewDocument = await this.findOne();
   next();
 });
