@@ -66,11 +66,18 @@ reviewSchema.statics.calcAverageRatings = async function(tourId) {
     }
   ]);
 
-  // persist data into tour document
-  await Tour.findByIdAndUpdate(tourId, {
-    ratingsAverage: stats[0].nRating,
-    ratingsQuantity: stats[0].avgRating
-  });
+  if (stats.length > 0) {
+    // persist data into tour document
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsAverage: stats[0].avgRating,
+      ratingsQuantity: stats[0].nRating
+    });
+  } else {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsAverage: 4.5,
+      ratingsQuantity: 0
+    });
+  }
 };
 
 // uses document middleware for after save
