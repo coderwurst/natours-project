@@ -73,11 +73,26 @@ reviewSchema.statics.calcAverageRatings = async function(tourId) {
   });
 };
 
+// uses document middleware for after save
 reviewSchema.post('save', function() {
   /* this.constructor points to current review, before Review object
    * has been instantiated (which would be too late for adding the
    * new review data */
   this.constructor.calcAverageRatings(this.tour);
+});
+
+// update and delete use query middleware and are handled differently
+reviewSchema.pre(/^findOneAnd/, async function(next) {
+  // to gain access to the document in query middleware and not just the query
+  this.reviewDocument = await this.findOne();
+  next();
+});
+
+reviewSchema.post(/^findOneAnd/, async function() {
+  // await this.findOne(); cannot work here as the query has already executed
+  await this.reviewDocument.constructor.calcAverageRatings(
+    this.reviewDocument.tour
+  );
 });
 
 const Review = new mongoose.model('Review', reviewSchema);
