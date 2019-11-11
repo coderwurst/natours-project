@@ -117,3 +117,41 @@ exports.getToursWithin = catchAsync(async (request, response, next) => {
     }
   });
 });
+
+exports.getDistances = catchAsync(async (request, response, next) => {
+  const { latlng, unit } = request.params;
+  const [latitude, longitude] = latlng.split(',');
+
+  const multiplier = unit === 'mi' ? 0.000621371 : 0.001;
+
+  if (!latitude || !longitude) {
+    next(new AppError('invalid coordinates provided', 400));
+  }
+
+  const distances = await Tour.aggregate([
+    {
+      $geoNear: {
+        near: {
+          type: 'Point',
+          coordinates: [longitude * 1, latitude * 1]
+        },
+        distanceField: 'distance',
+        distanceMultiplier: multiplier
+      }
+    },
+    {
+      $project: {
+        distance: 1,
+        name: 1
+      }
+    }
+  ]);
+
+  response.status(200).json({
+    status: 'success',
+    results: distances.length,
+    data: {
+      data: distances
+    }
+  });
+});

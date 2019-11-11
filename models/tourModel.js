@@ -185,11 +185,11 @@ tourSchema.post(/^find/, function(document, next) {
 });
 
 // aggregation pipeline - filter our secret tours for aggregations
-tourSchema.pre('aggregate', function(next) {
-  this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
-  console.log(this.pipeline());
-  next();
-});
+// tourSchema.pre('aggregate', function(next) {
+//   this.pipeline().unshift({ $match: { secretTour: { $ne: true } } });
+//   console.log(this.pipeline());
+//   next();
+// });
 
 const Tour = new mongoose.model('Tour', tourSchema);
 
