@@ -1,3 +1,4 @@
+const AppError = require('./../utils/appError');
 const Tour = require('./../models/tourModel');
 
 const catchAsync = require('./../utils/catchAsync');
@@ -87,5 +88,32 @@ exports.getMonthlyPlan = catchAsync(async (request, response, next) => {
   response.status(200).json({
     status: 'success',
     data: plan
+  });
+});
+
+exports.getToursWithin = catchAsync(async (request, response, next) => {
+  const { distance, latlng, unit } = request.params;
+  const [latitude, longitude] = latlng.split(',');
+
+  const radius = unit === 'mi' ? distance / 3963.2 : distance / 6378.1;
+
+  if (!latitude || !longitude) {
+    next(new AppError('invalid coordinates provided', 400));
+  }
+
+  const tours = await Tour.find({
+    startLocation: {
+      $geoWithin: {
+        $centerSphere: [[longitude, latitude], radius]
+      }
+    }
+  });
+
+  response.status(200).json({
+    status: 'success',
+    results: tours.length,
+    data: {
+      data: tours
+    }
   });
 });

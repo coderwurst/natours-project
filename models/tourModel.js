@@ -116,6 +116,9 @@ const tourSchema = new mongoose.Schema(
   }
 );
 
+// index for calculating geospatial data
+tourSchema.index({ startLocation: '2dsphere' });
+
 // compound index for price (ascending) and ratingsAverage (descending)
 tourSchema.index({ price: 1, ratingsAverage: -1 });
 
