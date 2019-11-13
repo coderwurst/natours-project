@@ -20,7 +20,7 @@ app.set('view engine', 'pug');
 app.set('views', path.join(__dirname, 'views'));
 
 // middlewares - GLOBAL SCOPE
-// serving static files
+// serving static files from public folder
 app.use(express.static(path.join(__dirname, 'public')));
 // set security http headers
 app.use(helmet());
@@ -64,7 +64,10 @@ app.use(
 // mount the routers, applying the specified middleware routers
 // VIEW Routes from ./views folder
 app.get('/', (request, response) => {
-  response.status(200).render('base');
+  response.status(200).render('base', {
+    tour: 'The Test Tour',
+    user: 'Joe Bloggs'
+  });
 });
 
 // API Routes
