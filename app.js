@@ -65,8 +65,19 @@ app.use(
 // VIEW Routes from ./views folder
 app.get('/', (request, response) => {
   response.status(200).render('base', {
-    tour: 'The Test Tour',
-    user: 'Joe Bloggs'
+    title: 'Exciting tours for adventurous people'
+  });
+});
+
+app.get('/overview', (request, response) => {
+  response.status(200).render('overview', {
+    title: 'All Tours'
+  });
+});
+
+app.get('/tour', (request, response) => {
+  response.status(200).render('tour', {
+    title: 'The Forest Hiker'
   });
 });
 

@@ -3,7 +3,7 @@ html
   head
     meta(charset='UTF-8')
     meta(name='viewport' content='width=device-width, initial-scale=1.0')
-    title Natours | Exciting tours for adventurous people
+    title Natours | #{title}
     link(rel='stylesheet' href='css/style.css')
     link(rel='shortcut icon' type='image/png' href='img/favicon.png')
     link(rel='stylesheet' href='https://fonts.googleapis.com/css?family=Lato:300,300i,700')
@@ -14,8 +14,8 @@ html
     // HEADER ends
 
     // CONTENT STARTS
-    main.main
-    h1= tour
+    block content
+      h1 Nothing here...
 
     // FOOTER STARTS
     include _footer
