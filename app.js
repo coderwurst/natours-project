@@ -10,6 +10,7 @@ const xss = require('xss-clean');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/userRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
+const viewRouter = require('./routes/viewRoutes');
 
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
@@ -62,24 +63,8 @@ app.use(
 );
 
 // mount the routers, applying the specified middleware routers
-// VIEW Routes from ./views folder
-app.get('/', (request, response) => {
-  response.status(200).render('base', {
-    title: 'Exciting tours for adventurous people'
-  });
-});
-
-app.get('/overview', (request, response) => {
-  response.status(200).render('overview', {
-    title: 'All Tours'
-  });
-});
-
-app.get('/tour', (request, response) => {
-  response.status(200).render('tour', {
-    title: 'The Forest Hiker'
-  });
-});
+// mount UI
+app.use('/', viewRouter);
 
 // API Routes
 app.use('/api/v1/tours', tourRouter);
