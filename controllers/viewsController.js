@@ -2,21 +2,25 @@ const Tour = require('../models/tourModel');
 const catchAsync = require('./../utils/catchAsync');
 
 exports.getOverview = catchAsync(async (request, response) => {
-  // get tours data from FeatureCollection
+  // get tours data
   const tours = await Tour.find();
 
-  // build template
-
   // render template using tour data
-
   response.status(200).render('overview', {
     title: 'Exciting tours for adventurous people',
     tours: tours
   });
 });
 
-exports.getTour = (request, response) => {
-  response.status(200).render('tour', {
-    title: 'The Forest Hiker'
+exports.getTour = catchAsync(async (request, response) => {
+  // get tours data
+  const tour = await Tour.findOne({ slug: request.params.slug }).populate({
+    path: 'reviews',
+    fields: 'review rating user'
   });
-};
+
+  // fill template with populated data
+  response.status(200).render('tour', {
+    tour: tour
+  });
+});
