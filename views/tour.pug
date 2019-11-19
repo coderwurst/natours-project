@@ -1,5 +1,9 @@
 extends base
 
+block append head
+  script(src='https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.js')
+  link( rel='stylesheet' href='https://api.mapbox.com/mapbox-gl-js/v1.4.1/mapbox-gl.css')
+
 mixin overviewBox(label, text, icon)
   .overview-box__detail
     svg.overview-box__icon
@@ -72,7 +76,7 @@ block content
         img.picture-box__img(src=`/img/tours/${image}`, alt=`${tour.name} ${index + 1}`, class=`picture-box__img--${index + 1}`)
     
   section.section-map
-    #map
+    #map(data-locations=`${JSON.stringify(tour.locations)}`)
 
   section.section-reviews
     .reviews

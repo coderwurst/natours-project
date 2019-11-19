@@ -21,6 +21,7 @@ exports.getTour = catchAsync(async (request, response) => {
 
   // fill template with populated data
   response.status(200).render('tour', {
+    title: tour.name,
     tour: tour
   });
 });

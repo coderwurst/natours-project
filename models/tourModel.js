@@ -99,7 +99,7 @@ const tourSchema = new mongoose.Schema(
         },
         coordinates: [Number],
         address: String,
-        descripton: String,
+        description: String,
         day: Number
       }
     ],
