@@ -1,3 +1,4 @@
+const cookieParser = require('cookie-parser');
 const express = require('express');
 const helmet = require('helmet');
 const hpp = require('hpp');
@@ -41,6 +42,7 @@ app.use('/api', limiter);
 
 // body parser - reading data from body into request.body to 10KB
 app.use(express.json({ limit: '10kb' }));
+app.use(cookieParser());
 
 // sanitize data against nosql injection after body has been parsed by filtering out $ and .
 app.use(mongoSanitize());
@@ -74,7 +76,7 @@ app.use('/api/v1/reviews', reviewRouter);
 // test middleware to view request headers
 app.use((request, response, next) => {
   request.requestTime = new Date().toISOString();
-  // console.log(request.headers);
+  console.log(request.cookies);
   next();
 });
 
