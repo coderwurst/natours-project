@@ -25,3 +25,10 @@ exports.getTour = catchAsync(async (request, response) => {
     tour: tour
   });
 });
+
+exports.login = catchAsync(async (request, response) => {
+  // log user in
+
+  // fill template with populated data
+  response.status(200).render('login');
+});
