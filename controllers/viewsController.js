@@ -27,10 +27,13 @@ exports.getTour = catchAsync(async (request, response, next) => {
 });
 
 exports.getLoginForm = (request, response) => {
-  // log user in
-
-  // fill template with populated data
   response.status(200).render('login', {
     title: 'login'
+  });
+};
+
+exports.getSignUpForm = (request, response) => {
+  response.status(200).render('signup', {
+    title: 'signup'
   });
 };
