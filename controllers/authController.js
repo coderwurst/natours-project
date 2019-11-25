@@ -107,6 +107,32 @@ exports.protect = catchAsync(async (request, response, next) => {
   next();
 });
 
+exports.isLoggedIn = catchAsync(async (request, response, next) => {
+  if (request.cookies.jwt) {
+    // 1. verify token
+    const decoded = await promisify(jwt.verify)(
+      request.cookies.jwt,
+      process.env.JWT_SECRET
+    );
+
+    // 2. check if user still exists
+    const currentUser = await User.findById(decoded.id);
+    if (!currentUser) {
+      return next();
+    }
+
+    // 3. check if user changed password after token creation
+    if (currentUser.changedPasswordAfter(decoded.iat)) {
+      return next();
+    }
+
+    // 4. logged-in user found, can be access via pug templates via locals
+    response.locals.user = currentUser;
+    next();
+  }
+  next();
+});
+
 // closure example
 exports.restrictTo = (...roles) => {
   return (request, response, next) => {
