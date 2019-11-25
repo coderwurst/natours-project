@@ -128,7 +128,7 @@ exports.isLoggedIn = catchAsync(async (request, response, next) => {
 
     // 4. logged-in user found, can be access via pug templates via locals
     response.locals.user = currentUser;
-    next();
+    return next();
   }
   next();
 });
