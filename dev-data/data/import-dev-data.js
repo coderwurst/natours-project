@@ -61,3 +61,6 @@ if (process.argv[2] === '--import') {
 
 // node dev-data/data/import-dev-data.js --import
 // node dev-data/data/import-dev-data.js --delete
+
+// NBNBNBNBNB dont forget to turn off password encryption before importing users!!
+// userModel added, modified and saved

@@ -42,6 +42,7 @@ app.use('/api', limiter);
 
 // body parser - reading data from body into request.body to 10KB
 app.use(express.json({ limit: '10kb' }));
+// parses data sent in cookiee
 app.use(cookieParser());
 
 // sanitize data against nosql injection after body has been parsed by filtering out $ and .
@@ -73,7 +74,7 @@ app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
 
-// test middleware to view request headers
+// test middleware to view request headers or cookiees
 app.use((request, response, next) => {
   request.requestTime = new Date().toISOString();
   console.log(request.cookies);
