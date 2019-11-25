@@ -10,8 +10,13 @@ const login = async (email, password) => {
         password
       }
     });
+    if (result.data.status === 'success') {
+      window.setTimeout(() => {
+        location.assign('/');
+      }, 1000);
+    }
   } catch (error) {
-    console.log(error.response.data);
+    alert(error.response.data.message);
   }
 };
 
