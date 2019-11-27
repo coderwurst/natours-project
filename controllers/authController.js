@@ -20,7 +20,7 @@ const createAndSendToken = (user, statusCode, response) => {
     expires: new Date(
       Date.now() + process.env.JWT_COOKIE_EXPIRES_IN * 24 * 60 * 60 * 1000
     ),
-    http: true
+    httpOnly: true
   };
 
   if (process.env.NODE_ENV === 'production') {
@@ -72,6 +72,16 @@ exports.login = catchAsync(async (request, response, next) => {
   createAndSendToken(user, 200, response);
 });
 
+exports.logout = (request, response) => {
+  response.cookie('jwt', 'loggedOut', {
+    expires: new Date(Date.now() + 10 * 1000),
+    httpOnly: true
+  });
+  response.status(200).json({
+    status: 'success'
+  });
+};
+
 exports.protect = catchAsync(async (request, response, next) => {
   // 1. get token
   let token;
@@ -107,31 +117,35 @@ exports.protect = catchAsync(async (request, response, next) => {
   next();
 });
 
-exports.isLoggedIn = catchAsync(async (request, response, next) => {
+exports.isLoggedIn = async (request, response, next) => {
   if (request.cookies.jwt) {
-    // 1. verify token
-    const decoded = await promisify(jwt.verify)(
-      request.cookies.jwt,
-      process.env.JWT_SECRET
-    );
+    try {
+      // 1. verify token
+      const decoded = await promisify(jwt.verify)(
+        request.cookies.jwt,
+        process.env.JWT_SECRET
+      );
 
-    // 2. check if user still exists
-    const currentUser = await User.findById(decoded.id);
-    if (!currentUser) {
+      // 2. check if user still exists
+      const currentUser = await User.findById(decoded.id);
+      if (!currentUser) {
+        return next();
+      }
+
+      // 3. check if user changed password after token creation
+      if (currentUser.changedPasswordAfter(decoded.iat)) {
+        return next();
+      }
+
+      // 4. logged-in user found, can be access via pug templates via locals
+      response.locals.user = currentUser;
+      return next();
+    } catch (error) {
       return next();
     }
-
-    // 3. check if user changed password after token creation
-    if (currentUser.changedPasswordAfter(decoded.iat)) {
-      return next();
-    }
-
-    // 4. logged-in user found, can be access via pug templates via locals
-    response.locals.user = currentUser;
-    return next();
   }
   next();
-});
+};
 
 // closure example
 exports.restrictTo = (...roles) => {
