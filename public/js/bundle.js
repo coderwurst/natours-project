@@ -8310,7 +8310,33 @@ module.exports.default = axios;
 
 },{"./utils":"../../node_modules/axios/lib/utils.js","./helpers/bind":"../../node_modules/axios/lib/helpers/bind.js","./core/Axios":"../../node_modules/axios/lib/core/Axios.js","./core/mergeConfig":"../../node_modules/axios/lib/core/mergeConfig.js","./defaults":"../../node_modules/axios/lib/defaults.js","./cancel/Cancel":"../../node_modules/axios/lib/cancel/Cancel.js","./cancel/CancelToken":"../../node_modules/axios/lib/cancel/CancelToken.js","./cancel/isCancel":"../../node_modules/axios/lib/cancel/isCancel.js","./helpers/spread":"../../node_modules/axios/lib/helpers/spread.js"}],"../../node_modules/axios/index.js":[function(require,module,exports) {
 module.exports = require('./lib/axios');
-},{"./lib/axios":"../../node_modules/axios/lib/axios.js"}],"login.js":[function(require,module,exports) {
+},{"./lib/axios":"../../node_modules/axios/lib/axios.js"}],"alerts.js":[function(require,module,exports) {
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.showAlert = exports.hideAlert = void 0;
+
+var hideAlert = function hideAlert() {
+  var element = document.querySelector('.alert');
+
+  if (element) {
+    element.parentElement.removeChild(element);
+  }
+};
+
+exports.hideAlert = hideAlert;
+
+var showAlert = function showAlert(type, message) {
+  hideAlert();
+  var markup = "<div class=\"alert alert--".concat(type, "\">").concat(message, "</div>");
+  document.querySelector('body').insertAdjacentHTML('afterbegin', markup);
+  window.setTimeout(hideAlert, 5000);
+};
+
+exports.showAlert = showAlert;
+},{}],"login.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -8319,6 +8345,8 @@ Object.defineProperty(exports, "__esModule", {
 exports.login = void 0;
 
 var _axios = _interopRequireDefault(require("axios"));
+
+var _alerts = require("./alerts");
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -8344,6 +8372,7 @@ var login = function login(email, password) {
           result = _context.sent;
 
           if (result.data.status === 'success') {
+            (0, _alerts.showAlert)('success', 'log in successful');
             window.setTimeout(function () {
               location.assign('/');
             }, 1000);
@@ -8355,7 +8384,7 @@ var login = function login(email, password) {
         case 7:
           _context.prev = 7;
           _context.t0 = _context["catch"](0);
-          alert(_context.t0.response.data.message);
+          (0, _alerts.showAlert)('error', _context.t0.response.data.message);
 
         case 10:
         case "end":
@@ -8366,7 +8395,7 @@ var login = function login(email, password) {
 };
 
 exports.login = login;
-},{"axios":"../../node_modules/axios/index.js"}],"mapbox.js":[function(require,module,exports) {
+},{"axios":"../../node_modules/axios/index.js","./alerts":"alerts.js"}],"mapbox.js":[function(require,module,exports) {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
