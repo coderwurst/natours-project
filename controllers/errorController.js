@@ -34,7 +34,7 @@ const sendErrorDev = (error, request, response) => {
     });
   }
   // RENDERED WEBSITE
-  return response.status(error.statusCode).render('errorTemplate', {
+  return response.status(error.statusCode).render('error', {
     title: ' Uh oh! Something went wrong!',
     message: error.message
   });
@@ -62,7 +62,7 @@ const sendErrorProd = (error, request, response) => {
   // RENDERED WEBSITE
   if (error.isOperational) {
     // trusted error
-    return response.status(error.statusCode).render('errorTemplate', {
+    return response.status(error.statusCode).render('error', {
       title: ' Uh oh! Something went wrong!',
       message: error.message
     });
@@ -70,7 +70,7 @@ const sendErrorProd = (error, request, response) => {
   // programming errors to be logged to console - not leaked to FE
   console.error(`ERROR: ${error}`);
   // then generic message sent to client
-  return response.status(error.statusCode).render('errorTemplate', {
+  return response.status(error.statusCode).render('error', {
     title: ' Uh oh! Something went wrong!',
     message: error.message
   });
