@@ -1,4 +1,5 @@
 const Tour = require('../models/tourModel');
+const AppError = require('./../utils/appError');
 const catchAsync = require('./../utils/catchAsync');
 
 exports.getOverview = catchAsync(async (request, response, next) => {
@@ -18,6 +19,10 @@ exports.getTour = catchAsync(async (request, response, next) => {
     path: 'reviews',
     fields: 'review rating user'
   });
+
+  if (!tour) {
+    return next(new AppError('There is no tour with that name', 404));
+  }
 
   // fill template with populated data
   response.status(200).render('tour', {

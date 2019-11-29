@@ -23,31 +23,57 @@ const handleJWTError = () =>
 const handleJWTExpiredError = () =>
   new AppError('token expired, please login again to continue', 401);
 
-const sendErrorDev = (error, response) => {
-  response.status(error.statusCode).json({
-    status: error.status,
-    error: error,
-    message: error.message,
-    stack: error.stack
+const sendErrorDev = (error, request, response) => {
+  // API ERROR
+  if (request.originalUrl.startsWith('/api')) {
+    return response.status(error.statusCode).json({
+      status: error.status,
+      error: error,
+      message: error.message,
+      stack: error.stack
+    });
+  }
+  // RENDERED WEBSITE
+  return response.status(error.statusCode).render('errorTemplate', {
+    title: ' Uh oh! Something went wrong!',
+    message: error.message
   });
 };
 
-const sendErrorProd = (error, response) => {
-  if (error.isOperational) {
-    // trusted error
-    response.status(error.statusCode).json({
-      status: error.status,
-      message: error.message
-    });
-  } else {
-    // programming errors to be logged to console
+const sendErrorProd = (error, request, response) => {
+  // API ERROR
+  if (request.originalUrl.startsWith('/api')) {
+    if (error.isOperational) {
+      // trusted error
+      return response.status(error.statusCode).json({
+        status: error.status,
+        message: error.message
+      });
+    }
+    // programming errors to be logged to console - not leaked to FE
     console.error(`ERROR: ${error}`);
     // then generic message sent to client
-    response.status(500).json({
+    return response.status(500).json({
       status: 'error',
       message: 'something went very wrong!'
     });
   }
+
+  // RENDERED WEBSITE
+  if (error.isOperational) {
+    // trusted error
+    return response.status(error.statusCode).render('errorTemplate', {
+      title: ' Uh oh! Something went wrong!',
+      message: error.message
+    });
+  }
+  // programming errors to be logged to console - not leaked to FE
+  console.error(`ERROR: ${error}`);
+  // then generic message sent to client
+  return response.status(error.statusCode).render('errorTemplate', {
+    title: ' Uh oh! Something went wrong!',
+    message: error.message
+  });
 };
 
 module.exports = (error, request, response, next) => {
@@ -55,9 +81,10 @@ module.exports = (error, request, response, next) => {
   error.status = error.status || 'error';
 
   if (process.env.NODE_ENV === 'development') {
-    sendErrorDev(error, response);
+    sendErrorDev(error, request, response);
   } else if (process.env.NODE_ENV === 'production') {
     let err = { ...error };
+    err.message = error.message;
 
     if (err.name === 'CastError') {
       err = handleCaseErrorDB(err);
@@ -79,6 +106,6 @@ module.exports = (error, request, response, next) => {
       err = handleJWTExpiredError();
     }
 
-    sendErrorProd(err, response);
+    sendErrorProd(err, request, response);
   }
 };
