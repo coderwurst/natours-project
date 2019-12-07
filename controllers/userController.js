@@ -1,8 +1,34 @@
-const User = require('../models/userModel');
+const multer = require('multer');
 
+const User = require('../models/userModel');
 const AppError = require('./../utils/appError');
 const catchAsync = require('./../utils/catchAsync');
 const factory = require('./handlerFactory');
+
+const multerStorage = multer.diskStorage({
+  destination: (request, response, callback) => {
+    callback(null, 'public/img/users');
+  },
+  filename: (request, file, callback) => {
+    const extension = file.mimetype.split('/')[1];
+    callback(null, `user-${request.user.id}-${Date.now()}.${extension}`);
+  }
+});
+
+const multerFilter = (request, file, callback) => {
+  if (file.mimetype.startsWith('image')) {
+    callback(null, true);
+  } else {
+    callback(new AppError('image format not recognised', 400), false);
+  }
+};
+
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter
+});
+
+exports.uploadUserPhoto = upload.single('photo');
 
 const filterObject = (body, ...allowedFields) => {
   const newObject = {};
@@ -59,6 +85,9 @@ exports.getMe = (request, response, next) => {
 
 exports.updateMe = catchAsync(async (request, response, next) => {
   const filteredBody = filterObject(request.body, 'name', 'email');
+  if (request.file) {
+    filteredBody.photo = request.file.filename;
+  }
 
   const updatedUser = await User.findByIdAndUpdate(
     request.user.id,
