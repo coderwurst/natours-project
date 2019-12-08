@@ -4,14 +4,13 @@ import '@babel/polyfill';
 import { login } from './login';
 import { logout } from './logout';
 import { displayMap } from './mapbox';
-import { updatePassword } from './updatePassword';
 import { updateSettings } from './updateSettings';
 
 // DOM ELEMENTS
-const accountSettingsForm = document.querySelector('.form-user-data');
 const loginForm = document.querySelector('.form');
 const logoutButton = document.querySelector('.nav__el--logout');
 const mapBox = document.getElementById('map');
+const accountSettingsForm = document.querySelector('.form-user-data');
 const passwordForm = document.querySelector('.form-user-password');
 
 // DELEGATION
@@ -36,20 +35,37 @@ if (logoutButton) {
 if (accountSettingsForm) {
   accountSettingsForm.addEventListener('submit', event => {
     event.preventDefault();
-    const name = document.getElementById('name').value;
-    const email = document.getElementById('email').value;
-    console.log(name, email);
-    updateSettings(name, email);
+
+    // create multipart form data
+    const form = new FormData();
+    form.append('name', document.getElementById('name').value);
+    form.append('email', document.getElementById('email').value);
+    form.append('photo', document.getElementById('photo').files[0]);
+
+    updateSettings(form, 'data');
   });
 }
 
 if (passwordForm) {
-  passwordForm.addEventListener('submit', event => {
+  passwordForm.addEventListener('submit', async event => {
     event.preventDefault();
+
+    document.querySelector('.btn--save-password').textContent = 'Updating...';
+
     const currentPassword = document.getElementById('password-current').value;
     const newPassword = document.getElementById('password').value;
     const newPasswordConfirm = document.getElementById('password-confirm')
       .value;
-    updatePassword(currentPassword, newPassword, newPasswordConfirm);
+
+    await updateSettings(
+      { currentPassword, newPassword, newPasswordConfirm },
+      'password'
+    );
+
+    // reset UI elements
+    document.getElementById('password-current').value = '';
+    document.getElementById('password').value = '';
+    document.getElementById('password-confirm').value = '';
+    document.querySelector('.btn--save-password').textContent = 'Save Password';
   });
 }

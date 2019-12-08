@@ -77,7 +77,7 @@ app.use('/api/v1/reviews', reviewRouter);
 // test middleware to view request headers or cookiees
 app.use((request, response, next) => {
   request.requestTime = new Date().toISOString();
-  console.log(request.cookies);
+  //console.log(request.cookies);
   next();
 });
 
