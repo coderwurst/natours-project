@@ -1,8 +1,77 @@
+const multer = require('multer');
+const sharp = require('sharp');
+
 const AppError = require('./../utils/appError');
 const Tour = require('./../models/tourModel');
 
 const catchAsync = require('./../utils/catchAsync');
 const factory = require('./handlerFactory');
+
+// save to memory buffer
+const multerStorage = multer.memoryStorage();
+
+const multerFilter = (request, file, callback) => {
+  if (file.mimetype.startsWith('image')) {
+    callback(null, true);
+  } else {
+    callback(new AppError('image format not recognised', 400), false);
+  }
+};
+
+const upload = multer({
+  storage: multerStorage,
+  fileFilter: multerFilter
+});
+
+exports.uploadTourImages = upload.fields([
+  {
+    name: 'imageCover',
+    maxCount: 1
+  },
+  {
+    name: 'images',
+    maxCount: 3
+  }
+]);
+
+exports.resizeTourImages = catchAsync(async (request, response, next) => {
+  if (!request.files.imageCover || !request.files.images) return next();
+
+  // cover image
+  // add to request body to be included with updateOne middleware
+  request.body.imageCover = `tour-${
+    request.params.id
+  }-${Date.now()}-cover.jpeg`;
+
+  await sharp(request.files.imageCover[0].buffer)
+    .resize(2000, 1333)
+    .toFormat('jpeg')
+    .jpeg({ quality: 90 })
+    .toFile(`public/img/tours/${request.body.imageCover}`);
+
+  // tour images - initiate empty array to store images
+  request.body.images = [];
+
+  // map (instead of foreach) to store 3 promises returned from async loop
+  // - awaits until all images have been processed
+  await Promise.all(
+    request.files.images.map(async (file, index) => {
+      const filename = `tour-${request.params.id}-${Date.now()}-${index +
+        1}.jpeg`;
+
+      await sharp(file.buffer)
+        .resize(500, 500)
+        .toFormat('jpeg')
+        .jpeg({ quality: 90 })
+        .toFile(`public/img/tours/${filename}`);
+
+      // add to images array to be included in tour updateOne
+      request.body.images.push(filename);
+    })
+  );
+
+  next();
+});
 
 exports.aliasTopTours = (request, response, next) => {
   request.query.limit = '5';
