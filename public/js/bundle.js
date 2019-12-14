@@ -8361,7 +8361,7 @@ var login = function login(email, password) {
           _context.next = 3;
           return regeneratorRuntime.awrap((0, _axios.default)({
             method: 'POST',
-            url: 'http://localhost:3000/api/v1/users/login',
+            url: 'http://127.0.0.1:3000/api/v1/users/login',
             data: {
               email: email,
               password: password
@@ -8419,7 +8419,7 @@ var logout = function logout(email, password) {
           _context.next = 3;
           return regeneratorRuntime.awrap((0, _axios.default)({
             method: 'GET',
-            url: 'http://localhost:3000/api/v1/users/logout'
+            url: 'http://127.0.0.1:3000/api/v1/users/logout'
           }));
 
         case 3:
@@ -8508,7 +8508,7 @@ var updateSettings = function updateSettings(data, type) {
         case 0:
           console.log(data);
           _context.prev = 1;
-          url = type === 'password' ? 'http://localhost:3000/api/v1/users/updatePassword' : 'http://localhost:3000/api/v1/users/updateMe';
+          url = type === 'password' ? 'http://127.0.0.1:3000/api/v1/users/updatePassword' : 'http://127.0.0.1:3000/api/v1/users/updateMe';
           _context.next = 5;
           return regeneratorRuntime.awrap((0, _axios.default)({
             method: 'PATCH',
